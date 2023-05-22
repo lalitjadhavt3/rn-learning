@@ -22,14 +22,13 @@ import Toast from 'react-native-simple-toast';
 import Menu from '../../components/Menu';
 import MenuItem from '../meeting/Components/MenuItem';
 import {ROBOTO_FONTS} from '../../styles/fonts';
-
-export default function Join({navigation}) {
+export default function Join(props) {
+ console.log(props.route);
  const [tracks, setTrack] = useState('');
  const [micOn, setMicon] = useState(true);
  const [videoOn, setVideoOn] = useState(true);
- const [name, setName] = useState('');
- const [meetingId, setMeetingId] = useState('');
-
+ const [name, setName] = useState(props.route.params.username);
+ const [meetingId, setMeetingId] = useState(props.route.params.joinLink);
  const meetingTypes = [{key: 'GROUP', value: 'Group Meeting'}];
 
  const [meetingType, setMeetingType] = useState(meetingTypes[0]);
@@ -50,7 +49,7 @@ export default function Join({navigation}) {
 
  const optionRef = useRef();
  const isMainScreen = () => {
-  return !isVisibleJoinMeetingContainer && !isVisibleCreateMeetingContainer;
+  return isVisibleJoinMeetingContainer && isVisibleCreateMeetingContainer;
  };
 
  useFocusEffect(
@@ -69,7 +68,7 @@ export default function Join({navigation}) {
  useFocusEffect(
   React.useCallback(() => {
    const onBackPress = () => {
-    if (!isMainScreen()) {
+    if (isMainScreen()) {
      setisVisibleCreateMeetingContainer(false);
      setisVisibleJoinMeetingContainer(false);
      return true;
@@ -202,7 +201,7 @@ export default function Join({navigation}) {
       </View>
      </View>
      <View style={{marginHorizontal: 32}}>
-      {!isVisibleCreateMeetingContainer && !isVisibleJoinMeetingContainer && (
+      {isVisibleCreateMeetingContainer && isVisibleJoinMeetingContainer && (
        <>
         <Button
          text={'Create a meeting'}
@@ -211,7 +210,7 @@ export default function Join({navigation}) {
          }}
         />
         <Button
-         text={'Join a meeting'}
+         text={'Join  meeting'}
          backgroundColor={'#202427'}
          onPress={() => {
           setisVisibleJoinMeetingContainer(true);

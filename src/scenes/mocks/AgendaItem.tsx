@@ -6,10 +6,11 @@ interface ItemProps {
   item: any;
   navigationLink:any;
   navigationTest:any;
+  usernameAuth:any;
 }
 
 const AgendaItem = (props: ItemProps) => {
-  const {item,navigationLink,navigationTest} = props;
+  const {item,navigationLink,navigationTest,usernameAuth} = props;
 
   const buttonPressed = useCallback(() => {
     //console.log(navigationTest);
@@ -29,7 +30,7 @@ const AgendaItem = (props: ItemProps) => {
         },
         {
           text: 'JOIN',
-          onPress: () => navigationTest.navigate('TestScreen', { joinLink: item.link })
+          onPress: () => navigationTest.navigate('Join', {joinLink: navigationLink,username:item.username})
         }
       ],
       { cancelable: true }
