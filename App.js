@@ -8,7 +8,7 @@ LogBox.ignoreAllLogs();
 export default function App() {
  return (
   <AuthProvider>
-   <BottomNavigation />
+   <BottomNavigation initialRouteName={'TimeTable'} />
   </AuthProvider>
  );
 }

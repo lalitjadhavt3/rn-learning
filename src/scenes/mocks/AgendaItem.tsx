@@ -30,7 +30,7 @@ const AgendaItem = (props: ItemProps) => {
         },
         {
           text: 'JOIN',
-          onPress: () => navigationTest.navigate('Join', {joinLink: navigationLink,username:item.username})
+          onPress: () => item.type=='online'?navigationTest.navigate('Join', {joinLink: navigationLink,username:item.username}):navigationTest.navigate('OfflineLecture', {joinLink: navigationLink,username:item.username})
         }
       ],
       { cancelable: true }

@@ -1,28 +1,15 @@
 import React, {useState} from 'react';
-import {SCREEN_NAMES} from './screenNames';
 import Join from '../scenes/join';
-import Meeting from '../scenes/meeting';
 import TimeTable from '../scenes/TimeTable';
-import {
- VideoOn,
- VideoOff,
- Person,
- Participants,
- Calendar,
- Home,
-} from '../assets/icons';
+import {Person, Calendar} from '../assets/icons';
 import Login from '../scenes/Login';
 import Register from '../scenes/register';
 import UserAccountSection from '../scenes/account';
 import {StyleSheet, Text, View, TextInput, Button, Alert} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-import colors from '../styles/colors';
-import {
- createBottomTabNavigator,
- BottomTabBar,
- BottomNavigationItem,
-} from '@react-navigation/bottom-tabs';
+import OfflineLecture from '../scenes/offline-lecture';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import TestScreen from '../scenes/TestScreen';
 
 const styles = StyleSheet.create({
  container: {
@@ -36,7 +23,9 @@ const styles = StyleSheet.create({
  },
 });
 
-const BottomNavigation = () => {
+const BottomNavigation = (props) => {
+ const {initialRouteName} = props;
+ console.log(initialRouteName);
  const Tab = createBottomTabNavigator();
  const getTabBarVisible = (route) => {
   const routeName = route.state?.routes[route.state.index]?.name;
@@ -51,27 +40,44 @@ const BottomNavigation = () => {
 
  return (
   <NavigationContainer>
-   <Tab.Navigator screenOptions={{tabBarVisible: getTabBarVisible}}>
+   <Tab.Navigator
+    initialRouteName={initialRouteName}
+    screenOptions={{tabBarVisible: getTabBarVisible}}
+   >
     <Tab.Screen
      name='Register'
      component={Register}
      options={{
-      title: 'Home',
-      tabBarLabel: 'Home',
-      tabBarIcon: ({color, size}) => (
-       <Home width={20} height={20} fill={color} />
-      ),
-      tabBarVisible: false,
-      tabBarBadgeStyle: {
-       backgroundColor: 'red',
-       color: 'white',
-      },
       headerShown: false,
+      tabBarStyle: {
+       display: 'none',
+      },
+      tabBarButton: () => null,
      }}
     />
     <Tab.Screen
      name='Join'
      component={Join}
+     options={{
+      tabBarStyle: {
+       display: 'none',
+      },
+      tabBarButton: () => null,
+     }}
+    />
+    <Tab.Screen
+     name='TestScreen'
+     component={TestScreen}
+     options={{
+      tabBarStyle: {
+       display: 'none',
+      },
+      tabBarButton: () => null,
+     }}
+    />
+    <Tab.Screen
+     name='OfflineLecture'
+     component={OfflineLecture}
      options={{
       tabBarStyle: {
        display: 'none',

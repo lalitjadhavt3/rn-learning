@@ -4,4 +4,6 @@ export const SCREEN_NAMES = {
  TimeTable: 'TimeTable_Screen',
  Login: 'Login_Screen',
  Register: 'Register_Screen',
+ OfflineLecture: 'OfflineLecture_Screen',
+ TestScreen: 'TestScreen',
 };

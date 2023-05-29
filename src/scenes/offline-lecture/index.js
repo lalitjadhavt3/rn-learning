@@ -3,19 +3,17 @@ import {View, TextInput, Button, StyleSheet, AsyncStorage} from 'react-native';
 import TimeTable from '../TimeTable';
 import axios from 'axios';
 import {AuthContext} from '../../components/Context/AuthContext';
-const Login = ({route, navigation}) => {
+const OfflineLecture = ({route, navigation}) => {
  const [username, setUsername] = useState('');
  const [password, setPassword] = useState('');
  const {setAuthToken} = useContext(AuthContext);
  const handleLogin = async () => {
-  console.log('test');
   try {
    var params = new URLSearchParams();
    const data = {username: username, password: password};
    params.append('username', username);
    params.append('password', password);
    const response = await axios.post('http://192.168.1.4/nexus/auth.php', data);
-   console.log(response);
    if (response.data.token) {
     try {
      await AsyncStorage.setItem('username', username);
@@ -69,4 +67,4 @@ const styles = StyleSheet.create({
  },
 });
 
-export default Login;
+export default OfflineLecture;

@@ -56,14 +56,28 @@ const TimeTable = ({t, navigation, props}) => {
   {
    data: [
     {
+     duration: '0.5h',
+     hour: '11am',
+     title: 'Offline Lecture',
+     link: 'https://google.com',
+     username: username,
+     type: 'offline',
+    },
+   ],
+   title: '2023-05-22',
+  },
+  {
+   data: [
+    {
      duration: '1h',
-     hour: '12am',
+     hour: '12pm',
      title: 'First Yoga',
      link: '1234-1234',
      username: username,
+     type: 'online',
     },
    ],
-   title: '2023-05-14',
+   title: '2023-05-22',
   },
  ];
  const marked = useRef(getMarkedDates());
