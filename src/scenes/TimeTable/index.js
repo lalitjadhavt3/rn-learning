@@ -14,6 +14,8 @@ import {
  Image,
  Button,
  Platform,
+ ScrollView,
+ RefreshControl,
  AsyncStorage,
 } from 'react-native';
 import {Images} from 'app-assets';
@@ -30,6 +32,7 @@ import AgendaItem from '../mocks/AgendaItem';
 import {getTheme, themeColor, lightThemeColor} from '../mocks/theme';
 import {getStatusBarHeight} from 'app-common';
 import api from '../../utils/api';
+import axios from 'axios';
 const leftArrowIcon = require('../../assets/img/previous.png');
 const rightArrowIcon = require('../../assets/img/next.png');
 const ITEMS = agendaItems;
@@ -38,6 +41,30 @@ const TimeTable = ({t, navigation, props}) => {
  const {authenticated, loading, username} = useAuth();
  const {authToken} = useContext(AuthContext);
  const [isLogin, setLogin] = useState(authToken);
+ const [refreshing, setRefreshing] = useState(false);
+ const [refreshCount, setRefreshCount] = useState(0);
+
+ const fetchData = async () => {
+  // Replace this URL with your API endpoint
+  const url = 'https://jsonplaceholder.typicode.com/todos/1';
+
+  try {
+   const response = await axios.get(url);
+   console.log(response.data);
+  } catch (error) {
+   console.error(error);
+  }
+ };
+
+ const onRefresh = useCallback(() => {
+  console.log(refreshCount);
+  setRefreshing(true);
+  fetchData().then(() => {
+   setRefreshing(false);
+   setRefreshCount(refreshCount + 1);
+  });
+ }, [refreshCount]);
+
  const onDateChanged = useCallback((date, updateSource) => {
   try {
    const response = api.get('/get_schedule.php', {
@@ -52,34 +79,66 @@ const TimeTable = ({t, navigation, props}) => {
   }
  }, []);
 
- const mock = [
-  {
-   data: [
-    {
-     duration: '0.5h',
-     hour: '11am',
-     title: 'Offline Lecture',
-     link: 'https://google.com',
-     username: username,
-     type: 'offline',
-    },
-   ],
-   title: '2023-05-22',
-  },
-  {
-   data: [
-    {
-     duration: '1h',
-     hour: '12pm',
-     title: 'First Yoga',
-     link: '1234-1234',
-     username: username,
-     type: 'online',
-    },
-   ],
-   title: '2023-05-22',
-  },
- ];
+ const mock =
+  refreshCount == 2
+   ? [
+      {
+       data: [
+        {
+         duration: '0.5h',
+         hour: '11am',
+         title: 'Offline Lecture',
+         link:
+          'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+         username: username,
+         type: 'offline',
+        },
+       ],
+       title: '2023-05-22',
+      },
+      {
+       data: [
+        {
+         duration: '1h',
+         hour: '12pm',
+         title: 'Offline Lecture-2',
+         link: 'http://techslides.com/demos/sample-videos/small.mp4',
+         username: username,
+         type: 'offline',
+        },
+       ],
+       title: '2023-05-25',
+      },
+      {
+       data: [
+        {
+         duration: '1h',
+         hour: '12pm',
+         title: 'First Yoga',
+         link: '1234-1234',
+         username: username,
+         type: 'online',
+        },
+       ],
+       title: '2023-05-22',
+      },
+     ]
+   : [
+      {
+       data: [
+        {
+         duration: '1h',
+         hour: '11am',
+         title: 'Offline Lecture before refresh',
+         link:
+          'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+         username: username,
+         type: 'offline',
+        },
+       ],
+       title: '2023-05-24',
+      },
+     ];
  const marked = useRef(getMarkedDates());
  const theme = useRef(getTheme());
  const todayBtnTheme = useRef({
@@ -98,58 +157,69 @@ const TimeTable = ({t, navigation, props}) => {
  }, []);
 
  return (
-  <View style={styles.container}>
-   {isLogin ? (
-    <>
-     <View style={styles.header}>
-      <View style={styles.header1}>
-       <Text style={styles.title}>TimeTable</Text>
+  <ScrollView
+   contentContainerStyle={{
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+   }}
+   refreshControl={
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+   }
+  >
+   <View style={styles.container}>
+    {!isLogin ? (
+     <>
+      <View style={styles.header}>
+       <View style={styles.header1}>
+        <Text style={styles.title}>TimeTable</Text>
+       </View>
       </View>
-     </View>
-     <CalendarProvider
-      date={ITEMS[1]?.title}
-      onDateChanged={onDateChanged}
-      // onMonthChange={onMonthChange}
-      showTodayButton
-      // disabledOpacity={0.6}
-      theme={todayBtnTheme.current}
-      // todayBottomMargin={16}
-     >
-      {weekView ? (
-       <WeekCalendar firstDay={1} markedDates={marked.current} />
-      ) : (
-       <ExpandableCalendar
-        theme={theme.current}
-        firstDay={1}
-        markedDates={marked.current}
-        leftArrowImageSource={leftArrowIcon}
-        rightArrowImageSource={rightArrowIcon}
-        animateScroll
-        // closeOnDayPress={false}
+      <CalendarProvider
+       date={ITEMS[1]?.title}
+       onDateChanged={onDateChanged}
+       // onMonthChange={onMonthChange}
+       showTodayButton
+       // disabledOpacity={0.6}
+       theme={todayBtnTheme.current}
+       // todayBottomMargin={16}
+      >
+       {weekView ? (
+        <WeekCalendar firstDay={1} markedDates={marked.current} />
+       ) : (
+        <ExpandableCalendar
+         theme={theme.current}
+         firstDay={1}
+         markedDates={marked.current}
+         leftArrowImageSource={leftArrowIcon}
+         rightArrowImageSource={rightArrowIcon}
+         animateScroll
+         // closeOnDayPress={false}
+        />
+       )}
+       <AgendaList
+        sections={mock}
+        renderItem={renderItem}
+        // scrollToNextEvent
+        sectionStyle={styles.section}
+        // dayFormat={'yyyy-MM-d'}
        />
-      )}
-      <AgendaList
-       sections={mock}
-       renderItem={renderItem}
-       // scrollToNextEvent
-       sectionStyle={styles.section}
-       // dayFormat={'yyyy-MM-d'}
+      </CalendarProvider>
+     </>
+    ) : (
+     <View style={styles.container2}>
+      <Text>Welcome, Guests!</Text>
+      <Text>Please Login to View Content!</Text>
+      <Button
+       title='Login'
+       onPress={() => {
+        navigation.navigate('Login', Login);
+       }}
       />
-     </CalendarProvider>
-    </>
-   ) : (
-    <View style={styles.container2}>
-     <Text>Welcome, Guest!</Text>
-     <Text>Please Login to View Content!</Text>
-     <Button
-      title='Login'
-      onPress={() => {
-       navigation.navigate('Login', Login);
-      }}
-     />
-    </View>
-   )}
-  </View>
+     </View>
+    )}
+   </View>
+  </ScrollView>
  );
 };
 

@@ -11,11 +11,14 @@ import {
  SafeAreaView,
  Dimensions,
  ScrollView,
+ Alert,
 } from 'react-native';
+import Login from '../Login';
+import TimeTable from '../TimeTable';
 import MultiSelect from 'react-native-multiple-select';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios';
-const Register = () => {
+const Register = ({navigation}) => {
  const [firstName, setFirstName] = React.useState('');
  const [middleName, setMiddleName] = React.useState('');
  const [lastName, setLastName] = React.useState('');
@@ -72,7 +75,9 @@ const Register = () => {
   if (!firstName) {
    errors.firstName = 'First name is required.';
   }
-
+  if (!middleName) {
+   errors.middleName = 'Middle name is required.';
+  }
   if (!lastName) {
    errors.lastName = 'Last name is required.';
   }
@@ -80,17 +85,13 @@ const Register = () => {
   if (!dateOfBirth) {
    errors.dateOfBirth = 'Date of birth is required.';
   }
-
-  if (!address) {
-   errors.address = 'Address is required.';
-  }
-
   if (!mobileNumber) {
    errors.mobileNumber = 'Mobile number is required.';
   }
   if (!address) {
-   errors.mobileNumber = 'Please Enter your Address.';
+   errors.address = 'Address is required.';
   }
+
   setValidationErrors(errors);
 
   return Object.keys(errors).length === 0;
@@ -98,7 +99,7 @@ const Register = () => {
  const handleSubmit = async () => {
   const isFormValid = validateForm();
   console.log(isFormValid);
-  if (0) {
+  if (isFormValid) {
    try {
     const formData = {
      firstName: firstName,
@@ -116,7 +117,26 @@ const Register = () => {
      formData
     );
 
-    console.log('Form submitted', response.data);
+    const res = response.data.trim();
+    if (res == 'success') {
+     Alert.alert('Registration Done!', 'Click ok to Login', [
+      {
+       text: 'Cancel',
+       onPress: () => navigation.navigate('Login', Login),
+       style: 'cancel',
+      },
+      {text: 'OK', onPress: () => navigation.navigate('Login', Login)},
+     ]);
+    } else {
+     Alert.alert('Something Went Wrong!', res, [
+      {
+       text: 'Cancel',
+       onPress: () => navigation.navigate('TimeTable', TimeTable),
+       style: 'cancel',
+      },
+      {text: 'OK', onPress: () => navigation.navigate('TimeTable', TimeTable)},
+     ]);
+    }
    } catch (error) {
     console.error('Error submitting form:', error);
    }
@@ -165,7 +185,14 @@ const Register = () => {
         <Text style={styles.errorText}>{validationErrors.firstName}</Text>
        )}
       </View>
-      <View style={styles.inputFieldContainer}>
+      <View
+       style={[
+        styles.inputFieldContainer,
+        validationErrors.middleName
+         ? styles.inputFieldContainerError
+         : styles.inputFieldContainer,
+       ]}
+      >
        <Image
         style={styles.inputFieldIcon}
         source={require('../../assets/user-icon.png')}
@@ -180,7 +207,14 @@ const Register = () => {
         <Text style={styles.errorText}>{validationErrors.middleName}</Text>
        )}
       </View>
-      <View style={styles.inputFieldContainer}>
+      <View
+       style={[
+        styles.inputFieldContainer,
+        validationErrors.lastName
+         ? styles.inputFieldContainerError
+         : styles.inputFieldContainer,
+       ]}
+      >
        <Image
         style={styles.inputFieldIcon}
         source={require('../../assets/user-icon.png')}
@@ -191,9 +225,12 @@ const Register = () => {
         value={lastName}
         onChangeText={(text) => setLastName(text)}
        />
+       {validationErrors.lastName && (
+        <Text style={styles.errorText}>{validationErrors.lastName}</Text>
+       )}
       </View>
 
-      <View style={styles.inputFieldContainer}>
+      <View style={[styles.inputFieldContainer]}>
        <Image
         style={styles.inputFieldIcon}
         source={require('../../assets/calendar.png')}
@@ -213,7 +250,14 @@ const Register = () => {
        )}
       </View>
 
-      <View style={styles.inputFieldContainer}>
+      <View
+       style={[
+        styles.inputFieldContainer,
+        validationErrors.mobileNumber
+         ? styles.inputFieldContainerError
+         : styles.inputFieldContainer,
+       ]}
+      >
        <Image
         style={styles.inputFieldIcon}
         source={require('../../assets/mobile.png')}
@@ -225,6 +269,9 @@ const Register = () => {
         value={mobileNumber}
         onChangeText={(text) => setMobileNumber(text)}
        />
+       {validationErrors.mobileNumber && (
+        <Text style={styles.errorText}>{validationErrors.mobileNumber}</Text>
+       )}
       </View>
       <View style={styles.inputFieldContainer}>
        <Image
@@ -238,6 +285,7 @@ const Register = () => {
         onChangeText={(text) => setReferralCode(text)}
        />
       </View>
+
       <TextInput
        placeholder='Address'
        style={styles.textarea}
@@ -263,7 +311,7 @@ const Register = () => {
         displayKey='name'
         searchInputStyle={{color: '#CCC'}}
         submitButtonColor='#185DCF'
-        submitButtonText='Submit'
+        submitButtonText='Ok'
         styleDropdownMenuSubsection={styles.dropdownMenuSubsection}
         styleTextDropdown={styles.dropdownText}
         styleDropdownMenu={styles.dropdownMenu}
