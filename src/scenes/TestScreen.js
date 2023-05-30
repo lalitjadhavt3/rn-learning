@@ -10,6 +10,7 @@ import {
  TouchableOpacity,
  SafeAreaView,
  Dimensions,
+ Alert,
 } from 'react-native';
 
 const TestScreen = () => {
@@ -38,7 +39,12 @@ const TestScreen = () => {
      <Text style={styles.buttonText}>Login</Text>
     </TouchableOpacity>
 
-    <TouchableOpacity style={styles.buttonByGoogle}>
+    <TouchableOpacity
+     style={styles.buttonByGoogle}
+     onPress={() => {
+      Alert.alert('This feature will be released soon!');
+     }}
+    >
      <View style={styles.googleIconWrapper}>
       <Image
        style={styles.googleIcon}

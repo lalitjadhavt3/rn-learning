@@ -4,7 +4,6 @@ import {AuthContext} from '../../components/Context/AuthContext';
 import Login from '../Login';
 import Register from '../register';
 import useAuth from '../../utils/useAuth';
-import TestScreen from '../TestScreen';
 const UserAccountSection = ({navigation, route}) => {
  const {authenticated, username} = useAuth();
  const {authToken, removeAuthToken} = useContext(AuthContext);
@@ -39,7 +38,7 @@ const UserAccountSection = ({navigation, route}) => {
      <Button
       title='Login'
       onPress={() => {
-       navigation.navigate('TestScreen', TestScreen);
+       navigation.navigate('Login', Login);
       }}
      />
      <Button
