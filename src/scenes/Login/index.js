@@ -59,15 +59,15 @@ const Login = ({route, navigation}) => {
    </View>
    <View style={styles.content}>
     <Text style={styles.description}>
-     Contrary to popular belief, Lorem Ipsum is not simply random text. It has
-     roots in a piece of classical Latin literature from 45 BC, making it over
+     Use your mobile number and password for login purpose!
     </Text>
    </View>
    <View style={styles.formContainer}>
     <TextInput
-     placeholder='Enter Username'
+     placeholder='Enter Mobile Number'
      style={styles.inputField}
      value={username}
+     keyboardType={'numeric'}
      onChangeText={setUsername}
     />
     <TextInput
@@ -80,26 +80,10 @@ const Login = ({route, navigation}) => {
     <TouchableOpacity style={styles.button} onPress={handleLogin}>
      <Text style={styles.buttonText}>Login</Text>
     </TouchableOpacity>
-
-    <TouchableOpacity
-     style={styles.buttonByGoogle}
-     onPress={() => {
-      Alert.alert('This feature will be released soon!');
-     }}
-    >
-     <View style={styles.googleIconWrapper}>
-      <Image
-       style={styles.googleIcon}
-       resizeMode='cover'
-       source={require('../../assets/image-1.png')}
-      />
-     </View>
-     <Text style={styles.googleText}>Login using Google</Text>
-    </TouchableOpacity>
    </View>
-   <TouchableOpacity style={styles.forgotPasswordButton}>
+   {/* <TouchableOpacity style={styles.forgotPasswordButton}>
     <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-   </TouchableOpacity>
+   </TouchableOpacity> */}
   </KeyboardAvoidingView>
  );
 };

@@ -108,6 +108,7 @@ const BottomNavigation = (props) => {
      name='Login'
      component={Login}
      options={() => ({
+      headerShown: false,
       tabBarStyle: {
        display: 'none',
       },
