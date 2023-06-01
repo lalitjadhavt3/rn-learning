@@ -18,6 +18,7 @@ import TimeTable from '../TimeTable';
 import MultiSelect from 'react-native-multiple-select';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios';
+import api from '../../utils/api';
 const Register = ({navigation}) => {
  const [firstName, setFirstName] = React.useState('');
  const [middleName, setMiddleName] = React.useState('');
@@ -35,7 +36,7 @@ const Register = ({navigation}) => {
  useEffect(() => {
   const getCourses = async () => {
    try {
-    const response = await axios.get(
+    const response = await api.get(
      'http://192.168.1.4/nexus/student/apis/get_courses.php',
      {params: null}
     );
@@ -88,6 +89,9 @@ const Register = ({navigation}) => {
   if (!mobileNumber) {
    errors.mobileNumber = 'Mobile number is required.';
   }
+  if (mobileNumber.length != 10) {
+   errors.mobileNumber = 'Enter Valid Mobile number';
+  }
   if (!address) {
    errors.address = 'Address is required.';
   }
@@ -98,7 +102,7 @@ const Register = ({navigation}) => {
  };
  const handleSubmit = async () => {
   const isFormValid = validateForm();
-  console.log(isFormValid);
+
   if (isFormValid) {
    try {
     const formData = {
@@ -111,32 +115,63 @@ const Register = ({navigation}) => {
      referralCode: referralCode,
      selectedCourses: selectedCourses,
     };
+    const checkMobile = async () => {
+     try {
+      const checkMobileRes = await api.get('/student/apis/check_mobile.php', {
+       params: {
+        mobileNumber: mobileNumber,
+       },
+      });
+      console.log(checkMobileRes.data);
+      if (checkMobileRes.data.data.found == 0) {
+       const response = await api.post(
+        'http://192.168.1.4/nexus/student/apis/register_student.php',
+        formData
+       );
 
-    const response = await axios.post(
-     'http://192.168.1.4/nexus/student/apis/register_student.php',
-     formData
-    );
-
-    const res = response.data.trim();
-    if (res == 'success') {
-     Alert.alert('Registration Done!', 'Click ok to Login', [
-      {
-       text: 'Cancel',
-       onPress: () => navigation.navigate('Login', Login),
-       style: 'cancel',
-      },
-      {text: 'OK', onPress: () => navigation.navigate('Login', Login)},
-     ]);
-    } else {
-     Alert.alert('Something Went Wrong!', res, [
-      {
-       text: 'Cancel',
-       onPress: () => navigation.navigate('TimeTable', TimeTable),
-       style: 'cancel',
-      },
-      {text: 'OK', onPress: () => navigation.navigate('TimeTable', TimeTable)},
-     ]);
-    }
+       const res = response.data.trim();
+       if (res == 'success') {
+        Alert.alert('Registration Done!', 'Click ok to Login', [
+         {
+          text: 'Cancel',
+          onPress: () => navigation.navigate('Login', Login),
+          style: 'cancel',
+         },
+         {text: 'OK', onPress: () => navigation.navigate('Login', Login)},
+        ]);
+       } else {
+        Alert.alert('Something Went Wrong!', res, [
+         {
+          text: 'Cancel',
+          onPress: () => navigation.navigate('TimeTable', TimeTable),
+          style: 'cancel',
+         },
+         {
+          text: 'OK',
+          onPress: () => navigation.navigate('TimeTable', TimeTable),
+         },
+        ]);
+       }
+      } else {
+       Alert.alert(
+        'This mobile number is already registered!',
+        'Click ok to Login',
+        [
+         {
+          text: 'Cancel',
+          onPress: () => navigation.navigate('Login', Login),
+          style: 'cancel',
+         },
+         {text: 'OK', onPress: () => navigation.navigate('Login', Login)},
+        ]
+       );
+      }
+     } catch (error) {
+      // Handle the error
+      console.error(error);
+     }
+    };
+    checkMobile();
    } catch (error) {
     console.error('Error submitting form:', error);
    }
