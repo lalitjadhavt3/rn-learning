@@ -22,13 +22,13 @@ import Toast from 'react-native-simple-toast';
 import Menu from '../../components/Menu';
 import MenuItem from '../meeting/Components/MenuItem';
 import {ROBOTO_FONTS} from '../../styles/fonts';
-export default function Join(props) {
- console.log(props.route);
+export default function Join({navigation}) {
+ console.log(navigation);
  const [tracks, setTrack] = useState('');
  const [micOn, setMicon] = useState(true);
  const [videoOn, setVideoOn] = useState(true);
- const [name, setName] = useState(props.route.params.username);
- const [meetingId, setMeetingId] = useState(props.route.params.joinLink);
+ const [name, setName] = useState('');
+ const [meetingId, setMeetingId] = useState('');
  const meetingTypes = [{key: 'GROUP', value: 'Group Meeting'}];
 
  const [meetingType, setMeetingType] = useState(meetingTypes[0]);
@@ -36,7 +36,7 @@ export default function Join(props) {
  const [isVisibleCreateMeetingContainer, setisVisibleCreateMeetingContainer] =
   useState(false);
  const [isVisibleJoinMeetingContainer, setisVisibleJoinMeetingContainer] =
-  useState(true);
+  useState(false);
 
  const disposeVideoTrack = () => {
   setTrack((stream) => {
@@ -201,7 +201,7 @@ export default function Join(props) {
       </View>
      </View>
      <View style={{marginHorizontal: 32}}>
-      {isVisibleCreateMeetingContainer && isVisibleJoinMeetingContainer && (
+      {!isVisibleCreateMeetingContainer && !isVisibleJoinMeetingContainer && (
        <>
         <Button
          text={'Create a meeting'}

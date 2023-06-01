@@ -10,7 +10,8 @@ import {NavigationContainer} from '@react-navigation/native';
 import OfflineLecture from '../scenes/offline-lecture';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import TestScreen from '../scenes/TestScreen';
-
+import Meeting from '../scenes/meeting';
+import {SCREEN_NAMES} from './screenNames';
 const styles = StyleSheet.create({
  container: {
   flex: 1,
@@ -115,7 +116,17 @@ const BottomNavigation = (props) => {
       tabBarButton: () => null,
      })}
     />
-
+    <Tab.Screen
+     name={SCREEN_NAMES.Meeting}
+     component={Meeting}
+     options={() => ({
+      headerShown: false,
+      tabBarStyle: {
+       display: 'none',
+      },
+      tabBarButton: () => null,
+     })}
+    />
     <Tab.Screen
      name='Account'
      component={UserAccountSection}

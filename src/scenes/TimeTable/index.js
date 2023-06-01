@@ -80,7 +80,7 @@ const TimeTable = ({t, navigation, props}) => {
  }, []);
 
  const mock =
-  refreshCount == 2
+  refreshCount < 100
    ? [
       {
        data: [

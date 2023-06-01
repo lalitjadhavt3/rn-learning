@@ -16,6 +16,8 @@ import {
 import TimeTable from '../TimeTable';
 import {AuthContext} from '../../components/Context/AuthContext';
 import api from '../../utils/api';
+import {SCREEN_NAMES} from '../../navigators/screenNames';
+import Join from '../join';
 const Login = ({route, navigation}) => {
  const [username, setUsername] = useState('');
  const [password, setPassword] = useState('');
@@ -35,16 +37,22 @@ const Login = ({route, navigation}) => {
       'http://192.168.1.4/nexus/auth.php',
       JSON.parse(str)
      );
-
+     console.log(response.data.data);
      if (response?.data?.data?.token) {
       try {
        await AsyncStorage.setItem('userId', response.data.data.id);
        await AsyncStorage.setItem('authToken', response.data.data.token);
-       await AsyncStorage.setItem('authToken', response.data.data.deviceId);
+       await AsyncStorage.setItem('deviceId', response.data.data.deviceId);
+       await AsyncStorage.setItem('usertype', response.data.data?.usertype);
        await AsyncStorage.setItem('username', username);
        await AsyncStorage.setItem('courseSelected', '');
        setAuthToken(response.data.data.token);
-       navigation.navigate('TimeTable', TimeTable);
+
+       if (response.data.data?.usertype > 2) {
+        navigation.navigate(SCREEN_NAMES.TimeTable);
+       } else {
+        navigation.navigate('Join', Join);
+       }
       } catch (error) {
        console.error('Error storing encrypted credentials:', error);
       }
