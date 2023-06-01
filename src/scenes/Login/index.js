@@ -14,34 +14,50 @@ import {
  AsyncStorage,
 } from 'react-native';
 import TimeTable from '../TimeTable';
-import axios from 'axios';
 import {AuthContext} from '../../components/Context/AuthContext';
+import api from '../../utils/api';
 const Login = ({route, navigation}) => {
  const [username, setUsername] = useState('');
  const [password, setPassword] = useState('');
  const {setAuthToken} = useContext(AuthContext);
  const handleLogin = async () => {
   try {
-   var params = new URLSearchParams();
-   const data = {username: username, password: password};
-   params.append('username', username);
-   params.append('password', password);
-   console.log(params);
-   const str = JSON.stringify(data);
-   const response = await axios.post(
-    'http://192.168.1.4/nexus/auth.php',
-    JSON.parse(str)
-   );
-   console.log(response);
-   if (response.data.token) {
-    try {
-     await AsyncStorage.setItem('username', username);
-     await AsyncStorage.setItem('authToken', response.data.token);
-     setAuthToken(response.data.token);
-     navigation.navigate('TimeTable', TimeTable);
-    } catch (error) {
-     console.error('Error storing encrypted credentials:', error);
+   if (username != '' && password != '') {
+    if (username.length == 10) {
+     var params = new URLSearchParams();
+     const data = {username: username, password: password, deviceId: 'abc'};
+     params.append('username', username);
+     params.append('password', password);
+     params.append('deviceId', 'abc');
+
+     const str = JSON.stringify(data);
+     const response = await api.post(
+      'http://192.168.1.4/nexus/auth.php',
+      JSON.parse(str)
+     );
+
+     if (response?.data?.data?.token) {
+      try {
+       await AsyncStorage.setItem('userId', response.data.data.id);
+       await AsyncStorage.setItem('authToken', response.data.data.token);
+       await AsyncStorage.setItem('authToken', response.data.data.deviceId);
+       await AsyncStorage.setItem('username', username);
+       await AsyncStorage.setItem('courseSelected', '');
+       setAuthToken(response.data.data.token);
+       navigation.navigate('TimeTable', TimeTable);
+      } catch (error) {
+       console.error('Error storing encrypted credentials:', error);
+      }
+     } else {
+      Alert.alert(response.data.message);
+     }
+    } else {
+     Alert.alert('Please Enter Valid Mobile number');
     }
+   } else if (username == '') {
+    Alert.alert('Please Enter Mobile number');
+   } else if (password == '') {
+    Alert.alert('Please Enter Password');
    }
   } catch (error) {
    // Handle login error
