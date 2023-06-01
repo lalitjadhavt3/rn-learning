@@ -1,5 +1,18 @@
 import React, {useContext, useState} from 'react';
-import {View, TextInput, Button, StyleSheet, AsyncStorage} from 'react-native';
+import {
+ Text,
+ StyleSheet,
+ View,
+ Image,
+ TextInput,
+ KeyboardAvoidingView,
+ Platform,
+ TouchableOpacity,
+ SafeAreaView,
+ Dimensions,
+ Alert,
+ AsyncStorage,
+} from 'react-native';
 import TimeTable from '../TimeTable';
 import axios from 'axios';
 import {AuthContext} from '../../components/Context/AuthContext';
@@ -8,13 +21,17 @@ const Login = ({route, navigation}) => {
  const [password, setPassword] = useState('');
  const {setAuthToken} = useContext(AuthContext);
  const handleLogin = async () => {
-  console.log('test');
   try {
    var params = new URLSearchParams();
    const data = {username: username, password: password};
    params.append('username', username);
    params.append('password', password);
-   const response = await axios.post('http://192.168.1.4/nexus/auth.php', data);
+   console.log(params);
+   const str = JSON.stringify(data);
+   const response = await axios.post(
+    'http://192.168.1.4/nexus/auth.php',
+    JSON.parse(str)
+   );
    console.log(response);
    if (response.data.token) {
     try {
@@ -33,39 +50,154 @@ const Login = ({route, navigation}) => {
  };
 
  return (
-  <View style={styles.container}>
-   <TextInput
-    style={styles.input}
-    placeholder='Username'
-    value={username}
-    onChangeText={setUsername}
-   />
-   <TextInput
-    style={styles.input}
-    placeholder='Password'
-    secureTextEntry
-    value={password}
-    onChangeText={setPassword}
-   />
-   <Button title='Login' onPress={handleLogin} />
-  </View>
+  <KeyboardAvoidingView
+   behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+   style={styles.container}
+  >
+   <View style={styles.header}>
+    <Text style={styles.title}>Login</Text>
+   </View>
+   <View style={styles.content}>
+    <Text style={styles.description}>
+     Contrary to popular belief, Lorem Ipsum is not simply random text. It has
+     roots in a piece of classical Latin literature from 45 BC, making it over
+    </Text>
+   </View>
+   <View style={styles.formContainer}>
+    <TextInput
+     placeholder='Enter Username'
+     style={styles.inputField}
+     value={username}
+     onChangeText={setUsername}
+    />
+    <TextInput
+     placeholder='Enter Password'
+     secureTextEntry={true}
+     style={styles.inputField}
+     onChangeText={setPassword}
+     value={password}
+    />
+    <TouchableOpacity style={styles.button} onPress={handleLogin}>
+     <Text style={styles.buttonText}>Login</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+     style={styles.buttonByGoogle}
+     onPress={() => {
+      Alert.alert('This feature will be released soon!');
+     }}
+    >
+     <View style={styles.googleIconWrapper}>
+      <Image
+       style={styles.googleIcon}
+       resizeMode='cover'
+       source={require('../../assets/image-1.png')}
+      />
+     </View>
+     <Text style={styles.googleText}>Login using Google</Text>
+    </TouchableOpacity>
+   </View>
+   <TouchableOpacity style={styles.forgotPasswordButton}>
+    <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+   </TouchableOpacity>
+  </KeyboardAvoidingView>
  );
 };
+
+const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
  container: {
   flex: 1,
-  justifyContent: 'center',
+  backgroundColor: 'white',
   alignItems: 'center',
-  padding: 16,
+  justifyContent: 'center',
  },
- input: {
+ header: {
+  marginTop: 50,
+ },
+ title: {
+  fontSize: 24,
+  fontWeight: '700',
+  color: 'black',
+ },
+ content: {
+  alignItems: 'center',
+  marginVertical: 20,
+  paddingHorizontal: 20,
+ },
+ description: {
+  textAlign: 'center',
+  color: 'black',
+  fontSize: 14,
+ },
+ formContainer: {
+  width: width * 0.8,
+  alignItems: 'center',
+ },
+ inputField: {
   width: '100%',
   height: 40,
-  borderColor: 'gray',
+  borderColor: '#969696',
   borderWidth: 1,
-  marginBottom: 12,
-  paddingHorizontal: 8,
+  borderRadius: 5,
+  marginTop: 10,
+  paddingHorizontal: 10,
+ },
+ button: {
+  backgroundColor: '#185DCF',
+  width: '100%',
+  height: 40,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 5,
+  marginTop: 10,
+ },
+ buttonText: {
+  color: 'white',
+  fontSize: 16,
+  fontWeight: '600',
+ },
+ buttonByGoogle: {
+  flexDirection: 'row',
+  alignItems: 'center',
+
+  width: '100%',
+  height: 40,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 5,
+  marginTop: 10,
+  borderColor: 'black',
+  borderWidth: 2,
+ },
+ googleIconWrapper: {
+  marginRight: 10,
+ },
+ googleIcon: {
+  width: 20,
+  height: 20,
+ },
+ googleText: {
+  color: 'black',
+  fontSize: 16,
+  fontWeight: '600',
+ },
+ backButton: {
+  position: 'absolute',
+  top: 20,
+  left: 10,
+ },
+ backIcon: {
+  width: 20,
+  height: 20,
+ },
+ forgotPasswordButton: {
+  marginTop: 20,
+ },
+ forgotPasswordText: {
+  color: 'blue',
+  fontSize: 13,
  },
 });
 

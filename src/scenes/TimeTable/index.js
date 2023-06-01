@@ -168,7 +168,7 @@ const TimeTable = ({t, navigation, props}) => {
    }
   >
    <View style={styles.container}>
-    {!isLogin ? (
+    {isLogin ? (
      <>
       <View style={styles.header}>
        <View style={styles.header1}>
