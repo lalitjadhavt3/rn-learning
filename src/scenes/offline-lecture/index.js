@@ -1,43 +1,124 @@
-import React, {useState} from 'react';
-import {View, StyleSheet, Text, TouchableOpacity, Button} from 'react-native';
+import React, {useState, useRef, useEffect} from 'react';
+import {
+ View,
+ StyleSheet,
+ Text,
+ TouchableOpacity,
+ BackHandler,
+ Alert,
+} from 'react-native';
 import Video from 'react-native-video';
 import Icon from 'react-native-vector-icons/FontAwesome';
-const OfflineLecture = (props) => {
- const [isPlaying, setIsPlaying] = useState(false);
- const [isRotated, setIsRotated] = useState(false);
- const [areSubtitlesVisible, setAreSubtitlesVisible] = useState(false);
- const [volume, setVolume] = useState(1);
+import Slider from '@react-native-community/slider';
+import TimeTable from '../TimeTable';
 
- //console.log(props.route.params);
+const OfflineLecture = ({navigation, route}) => {
+ console.log(route);
+ const [isPlaying, setIsPlaying] = useState(false);
+ const [currentTime, setCurrentTime] = useState(0);
+ const [duration, setDuration] = useState(0);
+ const [showControls, setShowControls] = useState(true);
+ const videoRef = useRef(null);
+ useEffect(() => {
+  const backHandler = BackHandler.addEventListener(
+   'hardwareBackPress',
+   handleBackPress
+  );
+
+  return () => backHandler.remove();
+ }, []);
+ const toggleControls = () => {
+  setShowControls(!showControls);
+ };
+ const handleBackPress = () => {
+  Alert.alert(
+   'Confirmation',
+   'Are you sure you want to exit the video?',
+   [
+    {text: 'Cancel', style: 'cancel'},
+    {
+     text: 'Exit',
+     onPress: () => console.log(navigation.navigate('TimeTable', TimeTable)),
+    },
+   ],
+   {cancelable: false}
+  );
+  return true;
+ };
  const togglePlayPause = () => {
   setIsPlaying(!isPlaying);
  };
 
+ const handleBackward = () => {
+  videoRef.current.seek(currentTime - 10);
+ };
+
+ const handleForward = () => {
+  videoRef.current.seek(currentTime + 10);
+ };
+
+ const handleSliderChange = (value) => {
+  setCurrentTime(value);
+  videoRef.current.seek(value);
+ };
+
+ const handleProgress = (progress) => {
+  setCurrentTime(progress.currentTime);
+ };
+
+ const handleLoad = (data) => {
+  setDuration(data.duration);
+ };
+
  return (
-  <View style={styles.container}>
+  <View style={styles.container} onTouchEnd={toggleControls}>
    <Video
-    source={{uri: props.route.params.joinLink}}
-    style={[styles.video, isRotated && styles.rotatedVideo]}
+    ref={videoRef}
+    source={{
+     uri: route.params.joinLink,
+    }}
+    //source={{uri: props.route.params.joinLink}}
+    style={styles.video}
     resizeMode='contain'
     paused={!isPlaying}
-    repeat={true}
-    playInBackground={false}
-    playWhenInactive={false}
-    ignoreSilentSwitch='ignore'
-    volume={volume}
-    selectedAudioTrack={{
-     type: 'title',
-     value: areSubtitlesVisible ? 1 : -1,
-    }}
+    onProgress={handleProgress}
+    onLoad={handleLoad}
+   />
+   {showControls && (
+    <View style={styles.overlay}>
+     <TouchableOpacity onPress={handleBackward} style={styles.button}>
+      <Icon name='backward' size={30} color='#fff' />
+     </TouchableOpacity>
+
+     <TouchableOpacity onPress={togglePlayPause} style={styles.button}>
+      <Icon name={isPlaying ? 'pause' : 'play'} size={30} color='#fff' />
+     </TouchableOpacity>
+
+     <TouchableOpacity onPress={handleForward} style={styles.button}>
+      <Icon name='forward' size={30} color='#fff' />
+     </TouchableOpacity>
+    </View>
+   )}
+   <Slider
+    style={styles.slidebar}
+    minimumValue={0}
+    maximumValue={duration}
+    value={currentTime}
+    onSlidingComplete={handleSliderChange}
+    minimumTrackTintColor='#fff'
+    maximumTrackTintColor='#888'
+    thumbTintColor='#fff'
    />
 
-   <View style={styles.overlay}>
-    <TouchableOpacity onPress={togglePlayPause} style={styles.button}>
-     <Icon name={isPlaying ? 'pause' : 'play'} size={30} color='#fff' />
-    </TouchableOpacity>
-   </View>
+   <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
   </View>
  );
+};
+
+const formatTime = (seconds) => {
+ const minutes = Math.floor(seconds / 60);
+ const secs = Math.floor(seconds % 60);
+ return `${minutes < 10 ? '0' : ''}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 };
 
 const styles = StyleSheet.create({
@@ -45,24 +126,25 @@ const styles = StyleSheet.create({
   flex: 1,
   backgroundColor: '#000',
  },
-
  video: {
   flex: 1,
  },
- rotatedVideo: {
-  transform: [{rotate: '90deg'}],
+ slidebar: {
+  width: '100%',
+  position: 'absolute',
+  bottom: 20,
  },
  overlay: {
   ...StyleSheet.absoluteFillObject,
   flexDirection: 'row',
   alignItems: 'center',
-  justifyContent: 'space-evenly',
+  justifyContent: 'center',
  },
  button: {
   padding: 10,
  },
- rotatedIcon: {
-  transform: [{rotate: '90deg'}],
+ timeText: {
+  color: '#fff',
  },
 });
 

@@ -49,7 +49,7 @@ const Login = ({route, navigation}) => {
        setAuthToken(response.data.data.token);
 
        if (response.data.data?.usertype > 2) {
-        navigation.navigate(SCREEN_NAMES.TimeTable);
+        navigation.navigate('TimeTable', TimeTable);
        } else {
         navigation.navigate('Join', Join);
        }

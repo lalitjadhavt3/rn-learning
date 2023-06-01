@@ -80,6 +80,7 @@ const BottomNavigation = (props) => {
      name='OfflineLecture'
      component={OfflineLecture}
      options={{
+      headerShown: false,
       tabBarStyle: {
        display: 'none',
       },
